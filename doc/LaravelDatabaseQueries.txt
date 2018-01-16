@@ -1,0 +1,33 @@
+﻿1. For Database Operation First include below in model
+        use Illuminate\Support\Facades\DB;
+                
+2. Multiple columns matching in where clause
+        ->where('vEmail', $email)
+           ->where('vPassword', $password)
+
+
+3. Getting multiple rows in select query
+        ->get()
+
+
+4. Getting single row in select query
+->first()
+
+
+5. Getting single record with select query
+        $admin_details = DB::table('administrators')
+            ->where('vEmail', $email)
+            ->where('vPassword', $password)->first();
+
+
+6. Not equal to in where clause
+        DB::table('administrators')->where('eStatus','<>','Deleted')->get();
+
+
+7. Insert Query
+DB::table($tablename)->insert([$data]);
+
+
+8. Order by Query
+    ->orderBy('iAdminId', 'desc')
+

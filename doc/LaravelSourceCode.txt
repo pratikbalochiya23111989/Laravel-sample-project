@@ -1,0 +1,281 @@
+﻿1. Create project
+composer create-project laravel/laravel projectname
+
+
+2. Create a new controller
+        php artisan make:controller LoginController
+
+
+3. Run Project in browser (http://127.0.0.1:8000)
+        php artisan serve
+
+
+4. For HTML & Form Collectives
+-> Begin by installing this package through Composer. Edit your project's composer.json file to require  laravelcollective/html.
+
+
+"require": {
+    "laravelcollective/html": "~5.0"
+}
+
+
+-> Next, update Composer from the Terminal: composer update
+-> Next, add your new provider to the providers array of config/app.php:
+'providers' => [
+    // ...
+    'Collective\Html\HtmlServiceProvider::class',
+    // ...
+  ],
+-> Finally, add two class aliases to the aliases array of config/app.php:
+'aliases' => [
+// ...
+  'Form' => Collective\Html\FormFacade::class,
+  'Html' => Collective\Html\HtmlFacade::class,
+// ...
+],
+
+
+5. Login form generate using laravel
+        <body>
+    <div class="container">
+        <center><h2><u>Horizontal form</u></h2></center>
+
+
+        {{ Form::open(array('url' => '/login','method' => 'post',' class' => 'form-horizontal')) }}
+            <div class="form-group">
+                {{ Form::label('lbl_email', 'Email: ', array('class' => 'control-label col-sm-2')) }}
+                <div class="col-sm-10">
+                    {{ Form::text('txt_email', '',array('class'=>'form-control','placeholder'=>'Enter your email')) }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ Form::label('lbl_pwd', 'Password: ', array('class' => 'control-label col-sm-2')) }}
+                <div class="col-sm-10">          
+                    {{ Form::password('txt_pwd',array('class'=>'form-control','placeholder'=>'Enter your password')) }}
+                </div>
+            </div>
+            <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                        <label>
+                            {{ Form::checkbox('remember_me', 'Remember me') }}
+                            Remember me
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">        
+                <div class="col-sm-offset-2 col-sm-10">
+                    {{ Form::submit('Submit',array('class'=>'btn btn-default')) }}
+                </div>
+            </div>
+        {{ Form::close() }}
+    </div>
+</body>
+
+
+6. Call controller from route with method
+        Route::resource('login','LoginController@index');
+
+
+7. Create a model
+        php artisan make:model Login
+
+
+8. Redirect to view
+        return view('forgotpassword');
+
+
+9. Create anchor link
+        {{ link_to('/forgotpassword', $title = 'Forgot Password?', $attributes = array(), $secure = null) }}
+
+
+10. Redirect from route to controller using form post method
+        Route::post('signme','LoginController@signme');
+        Also add use Illuminate\Routing\Controller;
+
+
+11. Validation Code in controller
+        $validator = Validator::make(
+                        array('txt_email'=>$email,'txt_pwd'=>$password),
+                        array('txt_email'=>'required','txt_pwd'=>'required')
+                );
+
+
+                if($validator->fails()){
+                        return redirect('/')->withErrors($validator)->withInput();
+                }
+                else {
+                        echo "no error found";
+                }
+
+
+12. Validation code in view
+        @if(count($errors)>0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>    
+        @endif
+
+
+13. Redirect to route from controller
+        return redirect('registration');
+
+
+14. Create a new table in database
+        -> php artisan make:migration create_users_table
+        -> php artisan migrate
+
+
+15. Add a new column to existing table
+        -> php artisan make:migration add_tDescription_to_settings
+        -> public function up()
+        {
+            Schema::table('settings', function($table) {
+                $table->text('tDescription');
+            });
+        }
+-> public function down()
+        {
+            Schema::table('settings', function($table) {
+                $table->dropColumn('tDescription');
+            });
+        }
+-> php artisan migrate
+
+
+16. Submit form data to controller
+        -> Add first : use Illuminate\Routing\Controller;
+        -> function signme(Request $request){
+            $vEmail = $request->vEmail;
+            $vPassword = $request->vPassword;
+
+
+            $validator = Validator::make(
+                array('email'=>$vEmail,'password'=>$vPassword),
+                array('email'=>'required','password'=>'required')
+            );
+
+
+            if($validator->fails()){
+                return redirect('/')->withErrors($validator)->withInput();
+            }
+            else {
+                     $status = Login::check_auth($vEmail,$vPassword);
+                    echo "<pre>";
+                    print_r($status);exit;
+            }
+}
+
+
+17. Call model method from controller
+        -> In Controller
+        -> Import model with : use App\Login;
+        -> $status = Login::check_auth($vEmail,$vPassword);
+
+
+        -> In Model
+        -> public static function check_auth($email,$password){}
+
+
+18. Use Session Flash
+        -> In Controller
+        $request->session()->flash("message", "Sorry, Capsule Surprise doesn't recognize that email!");
+ return redirect('/');
+        -> In View Blade File
+        @if(Session::has('message'))
+                {{ Session::get('message') }}
+        @endif
+
+
+19. Store data into session
+        i) $request->session()->put('robo_login_user_details', $message);
+        ii) 
+-> Import use Session; in controller
+-> Session::put('key', 'value');
+ 
+20. Get data from session
+        -> Import use Session; in controller
+        -> $value = Session::get('key');
+
+
+21. Redirect to controller from constructor
+        -> return redirect('/')->send();
+
+
+22. Use javascript in your blade file
+        -> @stack('javascript')
+
+
+23. Ternary in blade
+        class="{{ $pagename=='dashboard' ? 'active' : '' }}"
+
+
+24. Redirect to route using javascript
+        window.location.href = "administrator/create";
+
+
+25. From listing to update record
+        In Route : 
+        Route::get('administrator/update/{id}', 'AdminController@update');
+
+
+        In Controller : 
+public function update($id){}
+
+
+26. Dropdown with default selected value
+        { !! Form::select('country', $country, 'GB', ['id' = > 'country', 'class' = > 'form-control select2me']) !!}
+        Here above GB is the default selected value
+
+
+27. Some Routes Methods
+        In Route : 
+        // Management
+Route::get('management', 'ManagementController@showUser');
+Route::get('management/add', 'ManagementController@showAdd');
+Route::post('management/add', 'ManagementController@postAdd');
+Route::get('management/edit/{id}', 'ManagementController@showEdit');
+Route::post('management/edit/{id}', 'ManagementController@postEdit');
+Route::get('management/delete/{id}', 'ManagementController@showDelete');
+Route::post('management/delete/{id}', 'ManagementController@postDelete');
+
+
+In Controller : 
+public function showEdit($ID)
+{
+    
+}
+public function postEdit($ID)
+{
+    
+}
+
+
+28. Multiple where clauses
+        $query = DB::table('users')
+            ->whereRaw("users.id BETWEEN 1003 AND 1004")
+            ->whereNotIn('users.id', [1005,1006,1007])
+            ->whereIn('users.id',  [1008,1009,1010]);
+        $query->where(function($query2) use ($value)
+        {
+            $query2->where('user_type', 2)
+                ->orWhere('value', $value);
+        });
+
+
+        if ($user == 'admin'){
+            $query->where('users.user_name', $user);
+        }
+
+
+29. Setup Virtual Host On Ubuntu
+        https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-16-04
+        
+30. Run Laravel Project Without Artisan Command
+Reference URL : https://stackoverflow.com/questions/28788285/how-to-run-laravel-without-artisan
